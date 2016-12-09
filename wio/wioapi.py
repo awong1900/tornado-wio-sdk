@@ -25,7 +25,7 @@ try:
 except ImportError:
     import simplejson as json
 
-BASE_URL = "https://api.temp-io.life"
+BASE_URL = "https://temp-io.life"
 
 
 class WioAPI(object):
@@ -50,10 +50,7 @@ class WioAPI(object):
             query = {}
 
         if self.access_token:
-            if body is not None:
-                body["access_token"] = self.access_token
-            else:
-                query["access_token"] = self.access_token
+            query["access_token"] = self.access_token
 
         query_string = urllib.urlencode(query) if query else ""
         if method == "GET":
@@ -95,22 +92,8 @@ class WioAPIError(Exception):
     def __init__(self, result):
         self.result = result
         try:
-            self.type = result["error_code"]
+            self.message = result["error"]
         except:
-            self.type = ""
-
-        # OAuth 2.0 Draft 10
-        try:
-            self.message = result["error_description"]
-        except:
-            # OAuth 2.0 Draft 00
-            try:
-                self.message = result["error"]["message"]
-            except:
-                # REST server style
-                try:
-                    self.message = result["error_msg"]
-                except:
-                    self.message = result
+            self.message = result
 
         Exception.__init__(self, self.message)
